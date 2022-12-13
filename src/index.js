@@ -182,17 +182,19 @@ async function initialize() {
     name: 'patchShape',
     data: [author, i, d]
   }));
-  diagram.onShapeAdd((i, m) => ws.sendEvent({
-    name: 'addShape',
-    data: [i, m]
-  }));
+  diagram.onShapeAdd((i, m) => {
+    ws.sendEvent({ name: 'addShape', data: [i, m] });
+    ws.sendToGroup('draw', { name:'newMessage',data: [author, i, 'is Drawing']});
+  });
   diagram.onShapeRemove(i => {
     ws.sendEvent({ name: 'removeShape', data: i });
     ws.sendToGroup('draw', { name: 'removeShape', data: [author, i] });
+    ws.sendToGroup('draw', { name:'newMessage',data: [author, i, 'remove last Drawn shape']});
   });
   diagram.onClear(() => {
     ws.sendEvent({ name: 'clear' });
     ws.sendToGroup('draw', { name: 'clear', data: author });
+    ws.sendToGroup('draw', { name:'newMessage',data: [author, i, 'cleared the Drawing']});
   });
   diagram.onHistoryChange((p, f) => [appData.hasUndo, appData.hasRedo] = [p, f]);
 
